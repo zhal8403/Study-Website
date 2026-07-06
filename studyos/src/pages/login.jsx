@@ -5,9 +5,17 @@ export default function Login({ setUser, setToken })
 {
   const login = useGoogleLogin({
   scope: [
+    //Calendar
     "https://www.googleapis.com/auth/calendar",
+
+    //Gmail
     "https://www.googleapis.com/auth/gmail.modify",
     "https://www.googleapis.com/auth/gmail.send",
+
+    //Classroom
+    "https://www.googleapis.com/auth/classroom.courses.readonly",
+    "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
+    "https://www.googleapis.com/auth/classroom.announcements.readonly",
   ].join(" "),
 
   onSuccess: async (tokenResponse) => {

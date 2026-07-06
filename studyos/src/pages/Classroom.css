@@ -1,0 +1,35 @@
+#container {
+    padding: 30px;
+    background: brown;
+}
+
+#card {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 25px;
+}
+
+#courses {
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    overflow-y: auto;
+    max-height: 75vh;
+}
+
+#cHeader{
+    padding: 18px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+#assignment {
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 75vh;
+}
+
+#assignment-card {
+    border-bottom: 1px solid #eeeeee;
+    padding: 18px 0;
+}
