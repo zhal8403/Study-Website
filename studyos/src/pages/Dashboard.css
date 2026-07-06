@@ -1,0 +1,41 @@
+button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: white;
+    color: black;
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* Scrollbar for Upcoming Events */
+
+.upcoming-events::-webkit-scrollbar {
+    width: 8px;
+}
+
+.upcoming-events::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.upcoming-events::-webkit-scrollbar-thumb {
+    background: #333435;
+    border-radius: 999px;
+}
+
+.upcoming-events::-webkit-scrollbar-thumb:hover {
+    background: #222223;
+}

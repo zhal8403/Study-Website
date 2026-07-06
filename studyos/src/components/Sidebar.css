@@ -1,0 +1,102 @@
+.sidebar {
+    width:260px;
+    height:100vh;
+    background:#151A23;
+    color:white;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    padding:25px;
+
+    box-sizing:border-box;
+}
+
+.logo h1{
+    margin:0;
+    font-size:28px;
+}
+
+.logo p{
+    margin-top:5px;
+    color:#9CA3AF;
+}
+
+nav{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+    margin-top:35px;
+}
+
+nav button{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    border:none;
+    background:none;
+    color:white;
+
+    padding:14px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.2s;
+}
+
+nav button:hover{
+
+    background:#222938;
+
+}
+
+.active{
+
+    background:#2563EB !important;
+
+}
+
+.bottom{
+
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+
+}
+
+.profile{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.profile img{
+
+    width:50px;
+    height:50px;
+
+    border-radius:50%;
+
+}
+
+.profile p{
+
+    margin:0;
+
+    color:#9CA3AF;
+
+    font-size:13px;
+
+}
