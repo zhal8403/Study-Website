@@ -1,47 +1,58 @@
 import { useEffect, useState } from "react";
-import { getAllCalendarEvents } from "../services/googleCalendar";
+import { getAllCalendarEvents, getCalendars, createEvent, updateEvent, deleteEvent } from "../services/googleCalendar";
 
 import TodayView from "../components/calendar/TodayView";
 import WeekView from "../components/calendar/WeekView";
 import MonthView from "../components/calendar/MonthView";
+
+import NewEventModal from "../components/calendar/NewEventModal";
+
+import "./Calendar.css";
 
 function Calendar({ token }) {
     const [events, setEvents] = useState([]);
     const [view, setView] = useState("week");
     const [search, setSearch] = useState("");
     const [selectedEvent, setSelectedEvent] = useState(null);
-        const [showNewEvent, setShowNewEvent] = useState(false);
-
-    useEffect(() => {
-        async function load() {
-        if (!token) return;
+    const [showNewEvent, setShowNewEvent] = useState(false);
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [calendars, setCalendars] = useState([]);
+    
+    async function load() 
+    {
+        if (!token) 
+        {
+            return;
+        }
 
         const eventList = await getAllCalendarEvents(token);
 
         const sorted = eventList
-            .map((e) => ({
-            ...e,
-            startDate: new Date(e.start?.dateTime || e.start?.date),
-            }))
+            .map((e) => ({ ...e, startDate: new Date(e.start?.dateTime || e.start?.date),}))
             .sort((a, b) => a.startDate - b.startDate);
 
         setEvents(sorted);
+
+        const calendarList = await getCalendars(token);
+        setCalendars(calendarList);
     }
 
-    load();
-  }, [token]);
+    useEffect(() => 
+    {
+        load();
+    }, [token]);
 
-const now = new Date();
+const now = currentDate;
 
-const filteredEvents = events.filter((event) => {
+const filteredEvents = events.filter((event) => 
+{
     const start = event.startDate;
 
     // ---------- Time Filter ----------
     let matchesView = true;
 
     if (view === "today") {
-        matchesView =
-            start.toDateString() === now.toDateString();
+        matchesView = start.toDateString() === now.toDateString();
     }
 
     if (view === "week") {
@@ -75,7 +86,7 @@ const filteredEvents = events.filter((event) => {
             start < endOfMonth;
     }
 
-    // ---------- Search Filter ----------
+    // search 
     const searchText = search.toLowerCase();
 
     const matchesSearch =
@@ -96,81 +107,124 @@ const filteredEvents = events.filter((event) => {
     return matchesView && matchesSearch;
 });
 
-function createEvent(event) 
+async function createNewEvent(data) 
 {
+    const event = 
+    {
+        summary: data.summary,
+        description: data.description,
+        location: data.location,
+        start: 
+        {
+            dateTime: new Date(data.start).toISOString(),
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        end: 
+        {
+            dateTime: new Date(data.end).toISOString(),
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+    };
+    await createEvent(token, data.calendarId, event);
+
+    await load();
+
     setShowNewEvent(false);
+    setSelectedEvent(null);
+
+    console.log("Event created");
 }
 
-function updateEvent(event) 
+async function updateExistingEvent(data)
 {
+    const updates = { 
+        summary: data.summary,
+        description: data.description,
+        location: data.location,
+        start: {
+            dateTime: new Date(data.start).toISOString(),
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        end: {
+            dateTime: new Date(data.end).toISOString(),
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+    };
+
+    await updateEvent(
+        token,
+        selectedEvent.calendarId,
+        selectedEvent.id,
+        updates
+    );
+
+    await load();
+
+    setShowNewEvent(false);
     setSelectedEvent(null);
 }
 
-function deleteEvent(event) 
+async function deleteExistingEvent() 
 {
+    await deleteEvent( token, selectedEvent.calendarId, selectedEvent.id);
+
+    await load();
+
+    setShowNewEvent(false);
     setSelectedEvent(null);
 }
 
-  return (
-    <div style={{ padding: 30 }}>
+function changeDate(direction)
+{
+    const newDate = new Date(currentDate);
+
+    if(view === "week")
+    {
+        newDate.setDate(newDate.getDate() + direction * 7);
+    }
+
+    if(view === "month")
+    {
+        newDate.setMonth(newDate.getMonth() + direction );
+    }
+
+    if(view === "today")
+    {
+        newDate.setDate(newDate.getDate() + direction );
+    }
+
+    setCurrentDate(newDate);
+}
+
+return (
+    <div id="container">
         <h1>Calendar</h1>
 
-        <input
-            type="text"
-            placeholder="Search events..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: 10,
-                border: "1px solid #ccc",
-                marginBottom: 20,
-            }}
-        />
+        <input type="text" placeholder="Search events..." value={search} onChange={(e) => setSearch(e.target.value)} />
 
-        {/* VIEW BUTTONS */}
-        <div style={{ display: "flex", gap: 10, margin: "20px 0" }}>
+        <div id="button">
             {["today", "week", "month"].map((v) => (
-            <button
-                key={v}
-                onClick={() => setView(v)}
-                style={{
-                padding: "8px 16px",
-                borderRadius: 8,
-                border: "1px solid #ccc",
-                background: view === v ? "#2563eb" : "white",
-                color: view === v ? "white" : "black",
-                cursor: "pointer",
-            }}
-            >
-                {v.toUpperCase()}
-            </button>
-        ))}
-    </div>
+                <button key={v} style={{ background: view === v ? "#2563eb" : "white", color: view === v ? "white" : "black",}} onClick={() => setView(v)} >
+                    {v.toUpperCase()}
+                </button>
+            ))}
+        </div>
 
-        {/* VIEWS */}
-        {view === "today" && <TodayView events={filteredEvents}  onEventClick={setSelectedEvent} />}
-        {view === "week" && <WeekView events={filteredEvents}  onEventClick={setSelectedEvent} />}
-        {view === "month" && <MonthView events={filteredEvents}  onEventClick={setSelectedEvent} />}
+        <div id="when">
+            <button onClick={() => changeDate(-1)}>← Previous</button>
+            <button onClick={() => setCurrentDate(new Date())}>Today</button>
+            <button onClick={() => changeDate(1)}>Next →</button>
+        </div>
 
-        <button
-            onClick={() => setShowNewEvent(true)}
-            style={{
-                position: "fixed",
-                bottom: 30,
-                right: 30,
-                width: 60,
-                height: 60,
-                borderRadius: "50%",
-                fontSize: 30,
-                cursor: "pointer",
-                background: "#2563eb",
-                color: "white",
-                border: "none",
-                boxShadow: "0 4px 10px rgba(0,0,0,.2)",
-            }}
-        >
+        {view === "today" && <TodayView events={filteredEvents}  onEventClick={(event) => {setSelectedEvent(event); setShowNewEvent(true);}} currentDate={currentDate} />}
+        {view === "week" && <WeekView events={filteredEvents}  onEventClick={(event) => {setSelectedEvent(event); setShowNewEvent(true);}} currentDate={currentDate} />}
+        {view === "month" && <MonthView events={filteredEvents}  onEventClick={(event) => {setSelectedEvent(event); setShowNewEvent(true);}} currentDate={currentDate} />}
+
+        {showNewEvent && (
+            <NewEventModal event={selectedEvent} calendars={calendars} onClose={() => { setShowNewEvent(false); setSelectedEvent(null); }} onSave={selectedEvent ? updateExistingEvent : createNewEvent} onDelete={selectedEvent ? deleteExistingEvent : null}/>
+        )}
+
+        <button id="add" onClick={()=> { setSelectedEvent(null); setShowNewEvent(true);}}>
             +
         </button>
     </div>

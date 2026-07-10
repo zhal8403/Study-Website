@@ -1,8 +1,10 @@
-function TodayView({ events }) {
-  const today = new Date().toDateString();
+import "./today.css";
 
-  const todayEvents = events.filter(
-    (e) => e.startDate.toDateString() === today
+function TodayView({ events, currentDate }) 
+{
+  const todayEvents = events.filter
+  (
+    (e) => e.startDate.toDateString() === currentDate.toDateString()
   );
 
   return (
@@ -11,16 +13,14 @@ function TodayView({ events }) {
 
       {todayEvents.length === 0 && <p>No events today.</p>}
 
-      {todayEvents.map((event, i) => (
-        <details key={i} style={{ padding: 10, borderBottom: "1px solid #eee" }}>
-          <summary style={{ cursor: "pointer" }}>
+      {todayEvents.map((event, i) => 
+      (
+        <details key={i} id="today">
+          <summary id="summary">
             <strong>{event.summary}</strong>
             <br />
             <small>
-              {event.startDate.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {event.startDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit",})}
             </small>
           </summary>
 

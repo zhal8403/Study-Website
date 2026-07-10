@@ -26,28 +26,62 @@ export async function getAllCalendarEvents(accessToken) {
 
   let allEvents = [];
 
+  const currentYear = new Date().getFullYear();
+
+  // January 1 of this year
+  const timeMin = new Date(currentYear, 0, 1).toISOString();
+
+  // March 1 of next year (exclusive, so includes all of February)
+  const timeMax = new Date(currentYear + 1, 2, 1).toISOString();
+
   for (const calendar of calendars) {
     try {
-      const res = await fetch(
-        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
-          calendar.id
-        )}/events?singleEvents=true&orderBy=startTime&maxResults=250`,
-        {
+      console.log("Loading:", calendar.summary);
+
+      let pageToken = "";
+      let calendarEvents = [];
+
+      do {
+        const url =
+          `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+            calendar.id
+          )}/events` +
+          `?singleEvents=true` +
+          `&orderBy=startTime` +
+          `&timeMin=${encodeURIComponent(timeMin)}` +
+          `&timeMax=${encodeURIComponent(timeMax)}` +
+          `&maxResults=250` +
+          (pageToken ? `&pageToken=${pageToken}` : "");
+
+        const res = await fetch(url, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          console.error(calendar.summary, data.error);
+          break;
         }
-      );
 
-      const data = await res.json();
+        const events = (data.items || []).map((event) => ({
+          ...event,
+          calendarName: calendar.summary,
+          calendarId: calendar.id,
+        }));
 
-      const events = (data.items || []).map((event) => ({
-        ...event,
-        calendarName: calendar.summary,
-        calendarId: calendar.id,
-      }));
+        calendarEvents.push(...events);
 
-      allEvents.push(...events);
+        pageToken = data.nextPageToken || "";
+
+      } while (pageToken);
+
+      console.log(calendar.summary, calendarEvents.length);
+
+      allEvents.push(...calendarEvents);
+
     } catch (err) {
       console.error(calendar.summary, err);
     }
@@ -60,24 +94,18 @@ export async function getAllCalendarEvents(accessToken) {
   });
 }
 
-export async function getCalendars(accessToken) {
-  try {
+export async function getCalendars(token) {
     const res = await fetch(
-      "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+        "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
     );
 
     const data = await res.json();
-
     return data.items || [];
-  } catch (err) {
-    console.error("Calendar list error:", err);
-    return [];
-  }
 }
 
 export async function createEvent(token, calendarId = "primary", event)

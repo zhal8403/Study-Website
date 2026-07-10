@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
-
 import {getCourses, getCourseWork,} from "../services/classroom";
+
+import "./Classroom.css"
 
 function Classroom({token})
 {
@@ -11,6 +12,8 @@ function Classroom({token})
     {
         async function load() 
         {
+            console.log(token);
+
             if(!token)
             {
                 return;
@@ -19,10 +22,13 @@ function Classroom({token})
             const courseList = await getCourses(token);
             setCourses(courseList);
             let work = [];
+            console.log(courseList);
 
             for(const course of courseList)
             {
                 const assignments = await getCourseWork(token, course.id);
+    
+                console.log(assignments);
 
                 assignments.forEach((assignment) => 
                 {
@@ -79,7 +85,7 @@ function Classroom({token})
                     {assignments.length === 0?(
                         <p>No Assignments</p>
                     ):(
-                        assignments.map((assignments)=>(
+                        assignments.map((assignment)=>(
                             <div key={assignment.id} id="assignment-card">
                                 <strong>
                                     {assignment.title}

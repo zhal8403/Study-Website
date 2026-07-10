@@ -192,13 +192,13 @@ function Dashboard({ token, user }) {
                 </p>
 
                 <p>
-                📅{" "}
-                {start.toLocaleDateString(undefined, {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                })}
+                    📅{" "}
+                    {start.toLocaleDateString(undefined, {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                    })}
                 </p>
 
                 {event.start?.dateTime && (
@@ -212,7 +212,7 @@ function Dashboard({ token, user }) {
                 )}
 
                 {event.location && (
-                <p>📍 {event.location}</p>
+                    <p>📍 {event.location}</p>
                 )}
 
                 {event.description && (

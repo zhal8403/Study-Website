@@ -1,0 +1,50 @@
+#container {
+    padding: 30px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    background: if(style(--view: var(--v)): #2563eb; else: white);
+    color: if(style(--view: var(--v)): white; else: black);
+    cursor: pointer;
+}
+
+#button {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+#add {
+    --is-active: ; 
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 30px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+#when {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-top: 5px;
+}

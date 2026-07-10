@@ -13,17 +13,22 @@ export async function getCourses(token) {
     return data.courses || [];
 }
 
-export async function getCourseWork(token, courseId) {
+export async function getCourseWork(accessToken, courseId) {
     const res = await fetch(
         `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`,
         {
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${accessToken}`,
             },
         }
     );
 
     const data = await res.json();
+
+    if (!res.ok) {
+        console.log(JSON.stringify(data, null, 2));
+        return [];
+    }
 
     return data.courseWork || [];
 }
