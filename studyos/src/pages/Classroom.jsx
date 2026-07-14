@@ -12,7 +12,6 @@ function Classroom({token})
     {
         async function load() 
         {
-            console.log(token);
 
             if(!token)
             {
@@ -22,13 +21,10 @@ function Classroom({token})
             const courseList = await getCourses(token);
             setCourses(courseList);
             let work = [];
-            console.log(courseList);
 
             for(const course of courseList)
             {
                 const assignments = await getCourseWork(token, course.id);
-    
-                console.log(assignments);
 
                 assignments.forEach((assignment) => 
                 {

@@ -36,7 +36,6 @@ export async function getAllCalendarEvents(accessToken) {
 
   for (const calendar of calendars) {
     try {
-      console.log("Loading:", calendar.summary);
 
       let pageToken = "";
       let calendarEvents = [];
@@ -77,8 +76,6 @@ export async function getAllCalendarEvents(accessToken) {
         pageToken = data.nextPageToken || "";
 
       } while (pageToken);
-
-      console.log(calendar.summary, calendarEvents.length);
 
       allEvents.push(...calendarEvents);
 

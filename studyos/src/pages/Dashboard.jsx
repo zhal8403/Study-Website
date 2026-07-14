@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { getCalendars, getAllCalendarEvents } from "../services/googleCalendar";
 
 import "./Dashboard.css";
+import { generateSummary } from "../services/AI_API";
 
 function Dashboard({ token, user }) {
     const [events, setEvents] = useState([]);
     const [calendars, setCalendars] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("today");
+    const [summary, setSummary] = useState("Loading AI...");
 
     useEffect(() => {
         async function load() {
@@ -16,6 +18,7 @@ function Dashboard({ token, user }) {
         setLoading(true);
 
         try {
+
             const calList = await getCalendars(token);
             setCalendars(calList);
 
@@ -44,6 +47,78 @@ function Dashboard({ token, user }) {
 
         load();
     }, [token]);
+
+    useEffect(() => {
+        async function loadSummary() {
+            if (events.length === 0) return;
+
+            try {
+
+                const prompt = `
+                    You are StudyOS, an AI student assistant.
+
+                    Your job is to create a daily student briefing from the user's calendar.
+
+                    IMPORTANT RULES:
+                    - Only use the events provided below.
+                    - Do NOT invent holidays, assignments, tests, birthdays, or tasks.
+                    - Only include events happening within the next 7 days.
+                    - Pay special attention to deadlines, due dates, exams, meetings, and important tasks.
+                    - If something important is coming soon, warn the student.
+                    - Keep the briefing short and easy to scan.
+
+                    Format:
+
+                    🌅 Good Morning!
+                    Give a 1-2 sentence overview of the day.
+
+                    📅 Today's Schedule:
+                    List today's events with times.
+
+                    ⚠️ Watch Out For:
+                    Mention upcoming deadlines, tests, assignments, or important events in the next 7 days.
+
+                    🎯 Today's Focus:
+                    Give 1-2 productivity suggestions based on the schedule.
+
+                    💡 Motivation:
+                    Give a short encouraging message.
+
+                    Calendar events for the next 7 days:
+
+                    ${events.length > 0 
+                        ? events.map(e => {
+                            const start = new Date(e.start?.dateTime || e.start?.date);
+
+                            return `
+                    Event: ${e.summary}
+                    Date: ${start.toLocaleDateString()}
+                    Time: ${start.toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit"
+                    })}
+                    Description: ${e.description || "None"}
+                    `;
+                        }).join("\n")
+                        : "No events scheduled for the next 7 days."
+                    }
+
+                    Generate the briefing now.
+                    `;
+
+                const response = await generateSummary(prompt);
+
+                setSummary(response);
+
+            } catch (err) {
+                console.error(err);
+                setSummary("Failed to load AI summary.");
+            }
+        }
+
+        loadSummary();
+
+    }, [events]);
 
     function getFilteredEvents() {
         const now = new Date();
@@ -80,7 +155,24 @@ function Dashboard({ token, user }) {
     const filteredEvents = getFilteredEvents();
 
     return (
-        <div style={{ padding: "30px" }}>
+        
+
+          <div style={{ padding: "30px" }}>
+
+        <div
+            style={{
+                border: "1px solid #727280",
+                borderRadius: "16px",
+                padding: "20px",
+                marginTop: "20px",
+                marginBottom: "25px",
+                background: "#16162b",
+            }}
+        >
+            <h2>🤖 AI Summary</h2>
+            <p>{summary}</p>
+        </div>
+        
         <h1>
             Welcome{user ? `, ${user.given_name}` : ""}!
         </h1>
@@ -229,6 +321,7 @@ function Dashboard({ token, user }) {
     </div>
         </div>
     );
+    
 }
 
 export default Dashboard;

@@ -131,8 +131,6 @@ async function createNewEvent(data)
 
     setShowNewEvent(false);
     setSelectedEvent(null);
-
-    console.log("Event created");
 }
 
 async function updateExistingEvent(data)

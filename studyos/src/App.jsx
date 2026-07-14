@@ -7,8 +7,6 @@ import Calendar from "./pages/Calendar";
 import Gmail from "./pages/Gmail";
 import Drive from "./pages/Drive";
 import Classroom from "./pages/Classroom";
-import AI from "./pages/AI";
-import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 
 import Login from "./pages/login";
@@ -34,10 +32,6 @@ function App() {
         return <Drive token={token}/>;
       case "classroom":
         return <Classroom token={token}/>;
-      case "ai":
-        return <AI token={token}/>;
-      case "analytics":
-        return <Analytics token={token}/>;
       case "settings":
         return <Settings token={token}/>;
       default:

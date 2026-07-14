@@ -17,10 +17,6 @@ const items = [
     { id: "calendar", label: "Calendar", icon: <FaCalendarAlt /> },
     { id: "classroom", label: "Classroom", icon: <FaChalkboardTeacher /> },
     { id: "gmail", label: "Gmail", icon: <FaEnvelope /> },
-    { id: "notes", label: "Notes", icon: <FaStickyNote /> },
-    { id: "drive", label: "Drive", icon: <FaFolderOpen /> },
-    { id: "ai", label: "AI Planner", icon: <FaRobot /> },
-    { id: "analytics", label: "Analytics", icon: <FaChartBar /> },
 ];
 
 export default function Sidebar({ page, setPage, user, }) {
